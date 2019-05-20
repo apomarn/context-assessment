@@ -1,9 +1,29 @@
 import React from 'react';
 import './App.css';
 
+
+
+const MyContext = React.createContext();
+
+class MyProvider extends React.Component {
+  state = {
+    x:0
+  }
+
+  render() {
+    return(
+        <MyContext.Provider value={{
+          state: this.state
+        }}>
+          {this.props.children}
+        </MyContext.Provider>
+      )
+  }
+}
+
 class A extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       x: 0
     };
@@ -20,8 +40,8 @@ class A extends React.Component {
         <h1>Component A</h1>
         The state in the component A is {this.state.x} <br />
         this.handleXClick will set the state to a new value => {"this.setState({x: this.state.x + 1})"} <br />
-        <B x={this.state.x} onXClick={this.handleXClick} />
-        <D x={this.state.x} onXClick={this.handleXClick} />
+        <B  onXClick={this.handleXClick} />
+        <D  onXClick={this.handleXClick} />
       </div>
     );
   }
@@ -31,8 +51,11 @@ class B extends React.Component {
     return (
       <div className="component-B">
         <h1>Component B</h1>
-        this.props.x = {this.props.x} <br />
-        this.props.onXClick => (method from component A) <br />
+        <MyContext.Consumer>
+          {(context)=>(
+            <p>x: {context.state.x}</p>
+          )}
+        </MyContext.Consumer>
         <C x={this.props.x} onXClick={this.props.onXClick} />
       </div>
     );
@@ -68,9 +91,11 @@ class D extends React.Component {
 
 function App() {
   return (
+    <MyProvider>
     <div className="App">
       <A />
     </div>
+    </MyProvider>
   );
 }
 
